@@ -28,6 +28,45 @@ router.get('/:id/actions', validateProjectID, (req, res) => {
     })
 })
 
+// post new project
+router.post('/', validateProject, (req, res) => {
+  const newProject = req.body;
+
+  projectDB.insert(newProject)
+    .then(project => {
+      res.status(201).json(project)
+    })
+    .catch(error => {
+      res.status(404).json({ message: 'Server error posting a new project', error })
+    })
+})
+
+// update project
+router.put('/:id', validateProjectID, (req, res) => {
+  const id = req.params.id;
+  const newData = req.body;
+
+  projectDB.update(id, newData)
+    .then(updatedProject => {
+      res.status(200).json(updatedProject)
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'Server error updating project', error })
+    })
+})
+
+// delete project
+router.delete('/:id', validateProjectID, (req, res) => {
+  const id = req.params.id;
+
+  projectDB.remove(id)
+    .then(project => {
+      res.status(200).json({ message: 'Project deleted!', project })
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'Server error deleting project', error })
+    })
+})
 
 // custom middleware
 function validateProjectID(req, res, next) {
