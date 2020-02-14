@@ -37,7 +37,7 @@ router.post('/', validateProject, (req, res) => {
       res.status(201).json(project)
     })
     .catch(error => {
-      res.status(404).json({ message: 'Server error posting a new project', error })
+      // res.status(404).json({ message: 'Server error posting a new project', error })
     })
 })
 
