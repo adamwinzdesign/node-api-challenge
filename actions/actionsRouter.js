@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 })
 
 // get action by action id
-router.get('/:id', vaidateActionID, (req, res) => {
+router.get('/:id', validateActionID, (req, res) => {
   actionDB.get(req.params.id)
     .then(action => {
       res.status(200).json(action);
@@ -27,8 +27,46 @@ router.get('/:id', vaidateActionID, (req, res) => {
 })
 
 // post a new action to an existing project
+router.post('/', validateAction, (req, res) => {
+  const body = req.body;
+  actionDB.insert(body)
+    .then(action => {
+      res.status(201).json({action})
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: 'Server error posting action', error })
+    })
+})
 
-function vaidateActionID(req, res, next) {
+// update action
+router.put('/:id', validateActionID, validateAction, (req, res) => {
+  const id = req.params.id;
+  const body = req.body;
+
+  actionDB.update(id, body)
+    .then(action => {
+      res.status(200).json(action)
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: 'The action info could not be updated', error })
+    })
+})
+
+// delete action
+router.delete('/:id', validateActionID, (req, res) => {
+  const id = req.params.id;
+
+  actionDB.remove(id)
+    .then(action => {
+      res.status(200).json({ message: 'Action deleted!', action})
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: 'Action could not be deleted', error })
+    })
+});
+
+// custom middleware
+function validateActionID(req, res, next) {
   actionDB.get(req.params.id)
     .then(action => {
       if(action) {
@@ -40,12 +78,12 @@ function vaidateActionID(req, res, next) {
 }
 
 function validateAction(req, res, next) {
-  // const body = req.body;
-  // const desc = req.body.description;
-  // const notes = req.body.notes;
-  // const project_id = req.body.project_id;
+  const body = req.body;
+  const desc = req.body.description;
+  const notes = req.body.notes;
+  const project_id = req.body.project_id;
 
-  const { body, desc, notes, project_id } = req.body
+  // const { body, desc, notes, project_id } = req.body
 
   if(Object.keys(body).length === 0) {
     res.status(400).json({ message: 'Missing action data' })
