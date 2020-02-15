@@ -37,6 +37,7 @@ router.post('/', validateProject, (req, res) => {
       res.status(201).json(project)
     })
     .catch(error => {
+      // the .catch has been commented out in order to avoid an error caused by sending multiple headers.  Error handling has been passed to the middleware.
       // res.status(404).json({ message: 'Server error posting a new project', error })
     })
 })
@@ -77,22 +78,22 @@ function validateProjectID(req, res, next) {
       if(project) {
         next()
       } else {
-        res.status(404).json({ message: 'Could not locate that project! '})
+        res.status(404).json({ message: 'Could not locate that project!' })
       }
     })
 };
 
 function validateProject(req, res, next) {
   const body = req.body;
-  const name = req.body.name;
-  const description = req.body.description;
+  const { name, description } = req.body;
 
   if(Object.keys(body).length === 0) {
     res.status(400).json({ message: 'Missing project data' })
-  } else if(!name || !description) {
+  } else if(!name || !description || name === '' || description === '') {
     res.status(400).json({ message: 'Missing required name or description' })
+  } else if(name && description){
+    next();
   }
-  next();
 }
 
 module.exports = router;
