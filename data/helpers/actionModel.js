@@ -10,6 +10,7 @@ module.exports = {
 
 function get(id) {
   let query = db("actions");
+  console.log(`id from actionModel: ${id}`)
 
   if (id) {
     return query
